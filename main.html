@@ -1,0 +1,418 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espire Platform</title>
+</head>
+
+<body class="bg-espire-yellow min-h-screen flex flex-col font-sans">
+
+    <header class="bg-espire-white border-b border-yellow-200 p-6 shadow-sm">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-black text-gray-800 tracking-tighter">ESPIRE <span
+                    class="text-yellow-600">PLATFORM</span></h1>
+            <div id="auth-status" class="text-sm font-medium text-gray-500">Not Logged In</div>
+        </div>
+    </header>
+
+    <main class="container mx-auto flex-grow p-6">
+
+        <div id="role-selector"
+            class="max-w-md mx-auto mb-8 flex bg-white rounded-full p-1 shadow-inner border border-yellow-200">
+            <button onclick="setRole('team')" id="btn-team"
+                class="flex-1 py-2 rounded-full font-bold transition bg-yellow-400 text-black">TEAM PORTAL</button>
+            <button onclick="setRole('admin')" id="btn-admin"
+                class="flex-1 py-2 rounded-full font-bold transition text-gray-400">ADMIN PANEL</button>
+        </div>
+
+        <section id="auth-card"
+            class="max-w-md mx-auto bg-espire-white p-8 rounded-2xl shadow-xl border border-yellow-100">
+            <h2 id="form-title" class="text-2xl font-bold mb-6 text-gray-800">Team Login</h2>
+
+            <form id="mainForm" class="space-y-4">
+                <input type="text" id="input-name" placeholder="Name/Team Name"
+                    class="hidden w-full p-4 border border-yellow-100 rounded-xl bg-gray-50 focus:outline-yellow-400">
+                <input type="text" id="input-username" placeholder="Username (Admin only)"
+                    class="hidden w-full p-4 border border-yellow-100 rounded-xl bg-gray-50 focus:outline-yellow-400">
+                <input type="email" id="input-email" placeholder="Email Address"
+                    class="w-full p-4 border border-yellow-100 rounded-xl bg-gray-50 focus:outline-yellow-400" required>
+                <input type="password" id="input-pass" placeholder="Password"
+                    class="w-full p-4 border border-yellow-100 rounded-xl bg-gray-50 focus:outline-yellow-400" required>
+
+                <button type="submit" id="submit-btn"
+                    class="w-full bg-black text-white py-4 rounded-xl font-bold hover:opacity-90 transition">LOG
+                    IN</button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button onclick="toggleAuthMode()" id="toggle-mode-btn"
+                    class="text-sm text-gray-500 hover:text-black underline">Need an account? Register instead</button>
+            </div>
+        </section>
+
+        <section id="dashboard" class="hidden max-w-4xl mx-auto space-y-6">
+            <div class="bg-white p-8 rounded-2xl shadow-lg border-l-8 border-black">
+                <h2 class="text-3xl font-bold">Welcome Back!</h2>
+                <p id="user-display" class="text-gray-500"></p>
+                <button onclick="logout()" class="mt-4 text-red-500 font-bold hover:underline">Sign Out</button>
+            </div>
+
+            <div id="admin-tools" class="hidden bg-white p-8 rounded-2xl shadow-lg border border-yellow-200">
+                <h3 class="text-xl font-bold mb-4">Create New Match (Admin Only)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="match-title" placeholder="Match Title" class="p-3 border rounded-lg">
+                    <button onclick="createMatch()" class="bg-yellow-400 font-bold p-3 rounded-lg">Post Match</button>
+                </div>
+            </div>
+            <!-- Admin Tools: Create Match Performance -->
+            <div id="performance-tools" class="hidden bg-white p-8 rounded-2xl shadow-lg border border-yellow-200">
+                <h3 class="text-xl font-bold mb-4">Create Match Performance (Admin Only)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label for="perf-match-id"><b>Enter Match-ID</b></label>
+                    <input type="number" id="perf-match-id" placeholder="Match ID must be integer"
+                        class="p-3 border rounded-lg">
+                    <label for="perf-map-id"><b>Select Map</b></label>
+                    <select id="perf-map-id" class="p-3 border rounded-lg">
+                        <option value="Bermuda">Bermuda</option>
+                        <option value="Purgatory">Purgatory</option>
+                        <option value="Kalahari">Kalahari</option>
+                        <option value="Alpine">Alpine</option>
+                        <option value="Nexterra">Nexterra</option>
+                        <option value="Solara">Solara</option>
+                    </select>
+
+                    <label for="perf-team-id"><b>Select Team ID</b></label>
+                    <input list="teams" id="perf-team-id" name="team_id" class="p-3 border rounded-lg"
+                        placeholder="Type ID or name">
+                    <datalist id="teams"></datalist>
+
+
+                    <label for="team_name"><b>Team Name</b></label>
+                    <input type="text" id="team_name" placeholder="Team Name" name="team_name"
+                        class="p-3 border rounded-lg" readonly>
+
+                    <label for="perf-map-id"><b>Kills</b></label>
+                    <input type="number" id="perf-kills" placeholder="Kills" class="p-3 border rounded-lg">
+                    <label for="perf-result"><b>Result:</b></label>
+                    <select id="perf-result" class="p-3 border rounded-lg">
+                        <option value="Booyah">Booyah</option>
+                        <option value="2nd">2nd</option>
+                        <option value="3rd">3rd</option>
+                        <option value="4th">4th</option>
+                        <option value="5th">5th</option>
+                        <option value="6th">6th</option>
+                        <option value="7th">7th</option>
+                        <option value="8th">8th</option>
+                        <option value="9th">9th</option>
+                        <option value="10th">10th</option>
+                        <option value="11th">11th</option>
+                        <option value="12th">12th</option>
+                    </select>
+
+                    <button onclick="createPerformance()" class="bg-yellow-400 font-bold p-3 rounded-lg">Post
+                        Performance</button>
+                </div>
+            </div>
+            <!-- Team Tools: Watch Match Statistics -->
+            <div id="team-stats" class="hidden bg-white p-8 rounded-2xl shadow-lg border border-yellow-200">
+                <h3 class="text-xl font-bold mb-4">Your Match Statistics</h3>
+                <div id="stats-container" class="space-y-2 text-gray-700"></div>
+                <button onclick="loadStats()" class="mt-4 bg-yellow-400 font-bold p-3 rounded-lg">Refresh Stats</button>
+            </div>
+
+
+        </section>
+    </main>
+
+    <footer class="footer-black text-white p-10 mt-10">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h4 class="font-bold text-yellow-400 mb-4">ESPIRE PLATFORM</h4>
+                <p class="text-gray-400 text-sm">Professional Esports Management & Statistics Tracking.</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">Quick Links</h4>
+                <ul class="text-gray-400 text-sm space-y-2">
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">API Docs</a></li>
+                </ul>
+            </div>
+            <div class="text-right">
+                <p class="text-gray-500 text-xs">© 2026 Espire Platform Inc. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+        let currentRole = 'team'; // 'team' or 'admin'
+        let isRegisterMode = false;
+
+        function setRole(role) {
+            currentRole = role;
+            document.getElementById('btn-team').className = role === 'team' ? "flex-1 py-2 rounded-full font-bold bg-yellow-400 text-black" : "flex-1 py-2 rounded-full font-bold text-gray-400";
+            document.getElementById('btn-admin').className = role === 'admin' ? "flex-1 py-2 rounded-full font-bold bg-yellow-400 text-black" : "flex-1 py-2 rounded-full font-bold text-gray-400";
+            updateForm();
+        }
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            updateForm();
+        }
+
+        function updateForm() {
+            const title = document.getElementById('form-title');
+            const submitBtn = document.getElementById('submit-btn');
+            const toggleBtn = document.getElementById('toggle-mode-btn');
+            const nameInput = document.getElementById('input-name');
+            const userInput = document.getElementById('input-username');
+
+            title.innerText = `${isRegisterMode ? 'Register' : 'Login'} as ${currentRole.toUpperCase()}`;
+            submitBtn.innerText = isRegisterMode ? 'CREATE ACCOUNT' : 'LOG IN';
+            toggleBtn.innerText = isRegisterMode ? 'Already have an account? Login' : 'Need an account? Register instead';
+
+            nameInput.classList.toggle('hidden', !isRegisterMode);
+            userInput.classList.toggle('hidden', !(isRegisterMode && currentRole === 'admin'));
+        }
+
+        document.getElementById('mainForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('input-email').value;
+            const password = document.getElementById('input-pass').value;
+            const name = document.getElementById('input-name').value;
+            const username = document.getElementById('input-username').value;
+
+            try {
+                if (isRegisterMode) {
+                    const endpoint = currentRole === 'admin' ? '/registerAdmin' : '/registerTeam';
+                    const data = currentRole === 'admin' ? { name, email, password, username } : { team_name: name, email, password };
+                    await axios.post(API + endpoint, data);
+                    alert("Registration Successful! Now Login.");
+                    isRegisterMode = false;
+                    updateForm();
+                } else {
+                    const endpoint = currentRole === 'admin' ? '/loginAdmin' : '/loginTeam';
+                    const res = await axios.post(API + endpoint, { email, password });
+                    localStorage.setItem('espire_token', res.data.token);
+                    localStorage.setItem('espire_role', currentRole);
+                    loadDashboard();
+                }
+            } catch (err) {
+                alert("Error: " + (err.response?.data?.detail || "Check console"));
+            }
+        };
+
+        async function loadDashboard() {
+            const token = localStorage.getItem('espire_token');
+            const role = localStorage.getItem('espire_role');
+            if (!token) return;
+
+            try {
+                const endpoint = role === 'admin' ? '/adminProfile' : '/teamProfile';
+                const res = await axios.get(API + endpoint, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                document.getElementById('auth-card').classList.add('hidden');
+                document.getElementById('role-selector').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('auth-status').innerText = `Logged in as ${role.toUpperCase()}`;
+                document.getElementById('user-display').innerText = `Profile: ${res.data.email}`;
+
+                if (role === 'admin') {
+                    document.getElementById('admin-tools').classList.remove('hidden');
+                    document.getElementById('performance-tools').classList.remove('hidden');
+                };
+                if (role === 'team') {
+                    document.getElementById('team-stats').classList.remove('hidden');
+                }
+            } catch (err) {
+                logout();
+            }
+        }
+
+
+
+        async function createMatch() {
+            const token = localStorage.getItem('espire_token');
+            const matchInput = document.getElementById('match-title').value;
+
+            if (!matchInput) {
+                alert("Please enter at least one Map ID.");
+                return;
+            }
+
+            // Convert string "1, 2, 3" into an array of integers [1, 2, 3]
+            const mapsArray = matchInput.split(',')
+                .map(id => parseInt(id.trim()))
+                .filter(id => !isNaN(id));
+
+            if (mapsArray.length === 0) {
+                alert("Please enter valid numeric Map IDs (e.g., 1, 2)");
+                return;
+            }
+
+            try {
+                const now = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0'); // months are 0-based
+                const dd = String(today.getDate()).padStart(2, '0');
+                const hh = String(now.getHours()).padStart(2, '0');
+                const min = String(now.getMinutes()).padStart(2, '0');
+                const ss = String(now.getSeconds()).padStart(2, '0');
+                const localTimestamp = `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}`;
+
+                const response = await axios.post(`${API}/createTeamMatch`, {
+                    // maps: mapsArray, // This is now a List[int]
+                    match_date: localTimestamp,
+                    suffix: "01" // Matches datetime format
+                }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                alert("Match Created Successfully!");
+                document.getElementById('match-title').value = "";
+            } catch (err) {
+                // Detailed error logging
+                const errorData = err.response?.data?.detail;
+                if (Array.isArray(errorData)) {
+                    alert("Validation Error: " + errorData.map(e => `${e.loc[1]}: ${e.msg}`).join("\n"));
+                } else {
+                    alert("Error: " + (err.response?.data?.detail || "Connection failed"));
+                }
+            }
+        }
+
+        async function loadTeams() {
+            const response = await fetch("http://localhost:8000/teams"); // backend endpoint
+            const teams = await response.json();
+            const datalist = document.getElementById("teams");
+
+            teams.forEach(team => {
+                const option = document.createElement("option");
+                option.value = team.team_id
+                option.textContent = `${team.team_id} - ${team.team_name}`
+                datalist.appendChild(option);
+            });
+        }
+
+        document.getElementById("perf-team-id").addEventListener("change", async function () {
+            const teamId = this.value;
+            if (teamId) {
+                try {
+                    const response = await fetch(`http://localhost:8000/teams/${teamId}`);
+                    if (!response.ok) throw new Error("Team not found");
+                    const data = await response.json();
+                    document.getElementById("team_name").value = data.team_name;
+                } catch (err) {
+                    document.getElementById("team_name").value = "Not found"
+                }
+            }
+        });
+        // Load teams when page opens
+        loadTeams();
+
+        async function createPerformance() {
+            const token = localStorage.getItem('espire_token');
+            const data = {
+                match_id: (document.getElementById('perf-match-id').value),
+                map_name: document.getElementById('perf-map-id').options[
+                    document.getElementById('perf-map-id').selectedIndex
+                ].text,
+                team_id: (document.getElementById('perf-team-id').value),
+                kills: parseInt(document.getElementById('perf-kills').value),
+                result: document.getElementById('perf-result').value,
+                team_name: document.getElementById("team_name").value
+            };
+
+            try {
+                await axios.post(`${API}/createMatchPerformance`, data, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                alert("Performance Created Successfully!");
+                document.querySelectorAll('#performance-tools input').forEach(i => i.value = "");
+            } catch (err) {
+                alert("Error: " + (err.response?.data?.detail || "Connection failed"));
+            }
+        }
+
+
+        document.getElementById("team_id").addEventListener("change", async function () {
+            const teamId = this.value;
+            if (teamId) {
+                try {
+                    const response = await fetch(`/teams/${teamId}`);
+                    if (!response.ok) throw new Error("Team not found");
+                    const data = await response.json();
+                    document.getElementById("team_name").value = data.team_name;
+                } catch (err) {
+                    document.getElementById("team_name").value = "Not found";
+                }
+            }
+        });
+
+
+        async function loadStats() {
+            const token = localStorage.getItem('espire_token');
+            try {
+                const res = await axios.get(`${API}/watch-matchStatistics`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const statsContainer = document.getElementById('stats-container');
+                statsContainer.innerHTML = "";
+                // Create table
+                const table = document.createElement("table");
+                table.className = "min-w-full border-collapse border border-gray-300";
+
+                // Table header
+                const thead = document.createElement("thead");
+                thead.innerHTML = `
+            <tr class="bg-yellow-200 text-black font-bold">
+                <th class="border p-2">Match ID</th>
+                <th class="border p-2">Map</th>
+                <th class="border p-2">Team ID</th>
+                <th class="border p-2">Score</th>
+                <th class="border p-2">Kills</th>
+                <th class="border p-2">Result</th>
+                <th class="border p-2">Rating</th>
+                
+            </tr>
+        `;
+                table.appendChild(thead);
+
+                // Table body
+                const tbody = document.createElement("tbody");
+                res.data.forEach(stat => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                <td class="border p-2">${stat.match_id}</td>
+                <td class="border p-2">${stat.map_name}</td>
+                <td class="border p-2">${stat.team_id}</td>
+                <td class="border p-2">${stat.score}</td>
+                <td class="border p-2">${stat.kills}</td>
+                <td class="border p-2">${stat.result}</td>
+                <td class="border p-2">${stat.rating ?? "-"}</td>
+            `;
+                    tbody.appendChild(row);
+                });
+                table.appendChild(tbody);
+
+                statsContainer.appendChild(table);
+
+            } catch (err) {
+                alert("Error loading stats: " + (err.response?.data?.detail || "Connection failed"));
+            }
+        }
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+        
+
+        window.onload = loadDashboard;
+    </script>
+</body>
+
+</html>

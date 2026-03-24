@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espire Platform</title>
+    <style>
+        /* --- THEME & RESET --- */
+        :root {
+            --bg-color: #0f0f0f;
+            --surface-color: #1a1a1a;
+            --primary-color: #FFD700;
+            /* Yellow */
+            --primary-hover: #e6c200;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --border-color: #333333;
+            --error-color: #ff4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- NAVBAR --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--surface-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .nav-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* --- MAIN CONTENT & VIEWS --- */
+        main {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .view {
+            width: 100%;
+            max-width: 1000px;
+            display: none;
+            /* Hidden by default */
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .view.active {
+            display: block;
+            /* Shown when active */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- TYPOGRAPHY & UTILS --- */
+        h1,
+        h2,
+        h3 {
+            margin-bottom: 1rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-yellow {
+            color: var(--primary-color);
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: var(--bg-color);
+        }
+
+        /* --- FORMS --- */
+        .form-container {
+            background-color: var(--surface-color);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 4px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* --- TABLES --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            font-weight: bold;
+        }
+
+        /* --- CARDS & WIDGETS --- */
+        .post-card {
+            background-color: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .notification {
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            display: none;
+            /* Hidden by default */
+            text-align: center;
+            /* CRITICAL FIX: Make it float at the top center so it's always visible */
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+            min-width: 300px;
+        }
+
+        .notification.error {
+            background-color: #ffebee;
+            /* Light red */
+            color: var(--error-color);
+            border: 2px solid var(--error-color);
+        }
+
+        .notification.success {
+            background-color: #e8f5e9;
+            /* Light green */
+            color: #00C851;
+            border: 2px solid #00C851;
+        }
+
+        /* --- FOOTER --- */
+
+        :root {
+            --footer-bg: #121212;
+            /* Deep dark theme */
+            --accent-color: #00d4ff;
+            /* Tech/Esports Cyan */
+            --text-secondary: #b3b3b3;
+        }
+
+        .main-footer {
+            background-color: var(--footer-bg);
+            color: white;
+            padding: 40px 20px 20px 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-top: 1px solid #333;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .footer-column {
+            min-width: 200px;
+        }
+
+        .footer-column h3 {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+            /* Subtle movement effect */
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #222;
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        /* Responsive adjustment */
+        @media (max-width: 600px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-links a {
+                justify-content: center;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo" onclick="switchView('welcome')">Espire Platform</div>
+        <div class="nav-links">
+            <button class="nav-btn" onclick="switchView('welcome')">Home</button>
+            <button class="nav-btn" onclick="switchView('team-login')" id="nav-login-btn">Login</button>
+            <button class="nav-btn" onclick="handleCommunityClick()">Community</button>
+            <button class="nav-btn text-yellow hidden" id="nav-logout-btn" onclick="logout()"
+                style="display:none;">Logout</button>
+        </div>
+    </nav>
+
+    <main>
+        <div id="global-msg" class="notification"></div>
+
+        <section id="view-welcome" class="view active">
+            <div class="text-center" style="margin-top: 4rem;">
+                <h1 style="font-size: 3.5rem; font-weight: 900; letter-spacing: 2px;">DOMINATE <span
+                        class="text-yellow">THE ARENA</span></h1>
+                <p style="font-size: 1.2rem; color: var(--text-muted); max-width: 600px; margin: 1.5rem auto;">
+                    Welcome to the Espire Platform. The ultimate competitive ecosystem for esports teams. Track your
+                    performance, analyze statistics, and engage with the community.
+                </p>
+
+                <div style="display: flex; justify-content: center; gap: 2rem; margin: 3rem 0;">
+                    <div
+                        style="background: var(--surface-color); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                        <h3 class="text-yellow">100% Data Accuracy</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Real-time precision tracking.</p>
+                    </div>
+                    <div
+                        style="background: var(--surface-color); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                        <h3 class="text-yellow">24/7 Support</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Active community and admin help.</p>
+                    </div>
+                </div>
+
+                <button class="btn" style="font-size: 1.2rem; padding: 1rem 3rem;" onclick="switchView('register')">Get
+                    Started Free</button>
+            </div>
+        </section>
+
+        <section id="view-register" class="view">
+            <h2 class="text-center">Register New Team</h2>
+            <div class="form-container">
+                <form id="register-form" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Team Name</label>
+                        <input type="text" id="reg-name" maxlength="29" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="reg-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="reg-password" minlength="8" required>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%;">Register Team</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="view-team-login" class="view">
+            <h2 class="text-center">Team Login</h2>
+            <div class="form-container">
+                <form id="team-login-form" onsubmit="handleTeamLogin(event)">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="t-login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="t-login-password" required>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%;">Login</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="view-admin-login" class="view">
+            <h2 class="text-center text-yellow">Admin Login</h2>
+            <div class="form-container">
+                <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
+                    <div class="form-group">
+                        <label>Admin Email</label>
+                        <input type="email" id="a-login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="a-login-password" required>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%;">Authenticate Admin</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="view-team-dashboard" class="view">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h1 id="dash-team-name" class="uppercase text-yellow">TEAM NAME</h1>
+                    <p style="color: var(--text-muted);">Team ID: <span id="dash-team-id">---</span></p>
+                </div>
+                <button class="btn btn-outline" onclick="switchView('community')">Go to Community</button>
+            </div>
+
+            <h2>Your Match Statistics</h2>
+            <table id="team-stats-table">
+                <thead>
+                    <tr>
+                        <th>Match ID</th>
+                        <th>Map Name</th>
+                        <th>Kills</th>
+                        <th>Score</th>
+                        <th>Result</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody id="team-stats-body">
+                </tbody>
+            </table>
+        </section>
+
+        <section id="view-admin-dashboard" class="view">
+            <h1 class="text-yellow" style="margin-bottom: 2rem;">Admin Control Panel</h1>
+
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                <div class="form-container" style="flex: 1; margin: 0;">
+                    <h3>Create Match</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Format:
+                        ddmmESPyy{suffix}</p>
+                    <form onsubmit="handleCreateMatch(event)">
+                        <div class="form-group">
+                            <label>Match Suffix (e.g., 01, 02)</label>
+                            <input type="text" id="match-suffix" maxlength="2" required>
+                        </div>
+                        <button type="submit" class="btn">Generate Match</button>
+                    </form>
+                </div>
+
+                <div class="form-container" style="flex: 1; margin: 0;">
+                    <h3>Create Match Statistics</h3>
+                    <form onsubmit="handleCreateStats(event)">
+                        <div class="form-group">
+                            <label>Search/Select Match ID</label>
+                            <!-- <select id="stat-match-id" required></select> -->
+                            <input type="text" id="stat-match-id" list="match-datalist"
+                                placeholder="Type to search Match ID..." required>
+                            <datalist id="match-datalist"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>Search/Select Team ID</label>
+                            <!-- <select id="stat-team-id" onchange="autofetchTeamName()" required></select> -->
+                            <input type="text" id="stat-team-id" list="team-datalist"
+                                placeholder="Type to search Team ID..." oninput="autofetchTeamName()" required>
+                            <datalist id="team-datalist"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>Team Name (Auto-fetched)</label>
+                            <input type="text" id="stat-team-name" disabled
+                                style="background: #2a2a2a; cursor: not-allowed;">
+                        </div>
+                        <div class="form-group">
+                            <label>Map Name</label>
+                            <select id="stat-map-name" required>
+                                <option value="Bermuda">Bermuda</option>
+                                <option value="Purgatory">Purgatory</option>
+                                <option value="Kalahari">Kalahari</option>
+                                <option value="Alpine">Alpine</option>
+                                <option value="Nexterra">Nexterra</option>
+                                <option value="Solara">Solara</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Kills</label>
+                                <input type="number" id="stat-kills" min="0" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Result</label>
+                                <select id="stat-result" required>
+                                    <option value="Booyah">Booyah</option>
+                                    <option value="2nd">2nd</option>
+                                    <option value="3rd">3rd</option>
+                                    <option value="4th">4th</option>
+                                    <option value="5th">5th</option>
+                                    <option value="6th">6th</option>
+                                    <option value="7th">7th</option>
+                                    <option value="8th">8th</option>
+                                    <option value="9th">9th</option>
+                                    <option value="10th">10th</option>
+                                    <option value="11th">11th</option>
+                                    <option value="12th">12th</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn" style="width: 100%;">Submit Performance</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-community" class="view">
+            <h1 class="text-yellow text-center">Community Board</h1>
+
+            <div id="community-admin-gate" class="text-center" style="margin-bottom: 1rem;">
+                <p id="comm-status-msg" style="font-size: 0.9rem; color: var(--text-muted);"></p>
+                <button class="btn btn-outline" id="comm-admin-btn" onclick="switchView('admin-login')"
+                    style="font-size: 0.8rem;">Admin Login to Post</button>
+            </div>
+
+            <div id="admin-post-section" class="form-container" style="display: none; margin-bottom: 2rem;">
+                <h3>Publish Match Summary</h3>
+                <form onsubmit="handleCreatePost(event)">
+                    <div class="form-group">
+                        <label>Search Match ID to Summarize</label>
+                        <input type="text" id="post-match-id" list="match-datalist" placeholder="Type Match ID..."
+                            required>
+                    </div>
+                    <button type="submit" class="btn">Publish Summary</button>
+                </form>
+            </div>
+
+            <div id="community-feed">
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer header center">
+            <p>&copy; Espire Platform.</p>
+        </div>
+        <div class="footer-content">
+
+            <div class="footer-column">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="mailto:espireforyou@gmail.com" target="_blank"><i class="fas fa-envelope"></i> Email us</a></li>
+                    <li><a href="https://wa.me/+91 78548 08219?text=Hello%20,%20in%20Espire%20Platform" target="_blank"><i class="fab fa-whatsapp"></i>WhatsApp</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>Social</h3>
+                <ul class="footer-links">
+                    <li><a href="https://www.instagram.com/espire12?igsh=MTEwNjI3Zzlobm91Mg==" target="_blank"><i class="fab fa-instagram"></i> Instagram</a></li>
+                    <li><a href="" target="_blank"><i class="fab fa-youtube"></i> YouTube</a></li>
+                    <li><a href="https://discord.gg/hwZ4jCq5wX" target="_blank"><i class="fab fa-discord"></i> Discord</a></li>
+                </ul>
+            </div>
+
+        </div>
+        <div class="footer-bottom">
+            <p>&copy;2026 All Rights Reserved.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // --- CONFIG & STATE ---
+        const BASE_URL = 'http://localhost:8000'; // Change if backend runs elsewhere
+        let token = localStorage.getItem('espire_token') || null;
+        let role = localStorage.getItem('espire_role') || null; // 'team' or 'admin'
+        let cachedTeams = []; // Store teams to autofetch names
+
+        // --- UTILS ---
+        // --- UTILS ---
+        let msgTimeout; // Declare this outside so we can reset the timer
+
+        function showMsg(msg, isError = false) {
+            const el = document.getElementById('global-msg');
+
+            // 1. Update text and color class
+            el.textContent = msg;
+            el.className = 'notification ' + (isError ? 'error' : 'success');
+
+            // 2. CRITICAL FIX: Force it to display, overriding any previous hidden state
+            el.style.display = 'block';
+
+            // 3. Clear any existing timer so if you click twice fast, it doesn't vanish early
+            if (msgTimeout) clearTimeout(msgTimeout);
+
+            // 4. Hide it again after 4 seconds
+            msgTimeout = setTimeout(() => {
+                el.style.display = 'none';
+            }, 4000);
+        }
+
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const options = { method, headers };
+            if (body) options.body = JSON.stringify(body);
+
+            try {
+                const response = await fetch(`${BASE_URL}${endpoint}`, options);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    // This shows the specific Pydantic/FastAPI error instead of "Failed to fetch"
+                    throw new Error(errorData.detail || "Server Error");
+                }
+                return await response.json();
+            } catch (err) {
+                // If the server is down, err.message will be "Failed to fetch"
+                // If the server is up but data is wrong, it will show the backend's reason
+                showMsg(err.message, true);
+                throw err;
+            }
+        }
+        // --- NAVIGATION ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            document.getElementById('global-msg').style.display = 'none';
+            updateNavUI();
+
+            // Init specific views based on roles
+            if (viewId === 'team-dashboard' && role === 'team') loadTeamDashboard();
+            if (viewId === 'admin-dashboard' && role === 'admin') loadAdminDashboard();
+            if (viewId === 'community') loadCommunity();
+        }
+
+        function updateNavUI() {
+            const loginBtn = document.getElementById('nav-login-btn');
+            const logoutBtn = document.getElementById('nav-logout-btn');
+            if (token) {
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+            } else {
+                loginBtn.style.display = 'inline-block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        function handleCommunityClick() {
+            if (!token) {
+                showMsg('Please login as a Team or Admin to access the Community.', true);
+                switchView('team-login');
+            } else {
+                switchView('community');
+            }
+        }
+
+        function logout() {
+            token = null; role = null;
+            localStorage.removeItem('espire_token');
+            localStorage.removeItem('espire_role');
+            switchView('welcome');
+            showMsg('Logged out successfully.');
+        }
+
+        // --- AUTHENTICATION ---
+        async function handleRegister(e) {
+            e.preventDefault();
+            const body = {
+                team_name: document.getElementById('reg-name').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value
+            };
+            try {
+                await apiCall('/registerTeam', 'POST', body);
+                showMsg('Registration Successful! Please login.');
+                switchView('team-login');
+            } catch (err) { }
+        }
+
+        async function handleTeamLogin(e) {
+            e.preventDefault();
+            const body = {
+                email: document.getElementById('t-login-email').value,
+                password: document.getElementById('t-login-password').value
+            };
+            try {
+                const res = await apiCall('/loginTeam', 'POST', body);
+                token = res.token;
+                role = 'team';
+                localStorage.setItem('espire_token', token);
+                localStorage.setItem('espire_role', role);
+                showMsg('Team Login Successful!');
+                switchView('team-dashboard');
+            } catch (err) { }
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const body = {
+                email: document.getElementById('a-login-email').value,
+                password: document.getElementById('a-login-password').value
+            };
+            try {
+                const res = await apiCall('/loginAdmin', 'POST', body);
+                token = res.token;
+                role = 'admin';
+                localStorage.setItem('espire_token', token);
+                localStorage.setItem('espire_role', role);
+                showMsg('Admin Login Successful!');
+                switchView('admin-dashboard');
+            } catch (err) { }
+        }
+
+        // --- TEAM DASHBOARD ---
+        async function loadTeamDashboard() {
+            try {
+                const profile = await apiCall('/teamProfile');
+                document.getElementById('dash-team-name').textContent = profile.team_name;
+                document.getElementById('dash-team-id').textContent = profile.id;
+
+                const stats = await apiCall('/watch-matchStatistics');
+                const tbody = document.getElementById('team-stats-body');
+                tbody.innerHTML = '';
+
+                if (stats.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No match statistics found.</td></tr>';
+                    return;
+                }
+
+                stats.forEach(s => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${s.match_id}</td>
+                            <td>${s.map_name}</td>
+                            <td>${s.kills}</td>
+                            <td>${s.score}</td>
+                            <td><strong class="${s.result === 'Booyah' ? 'text-yellow' : ''}">${s.result}</strong></td>
+                            <td>${s.rating}</td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                if (err.message.includes('Unauthorized')) logout();
+            }
+        }
+
+        // --- ADMIN DASHBOARD ---
+        async function loadAdminDashboard() {
+            try {
+                const matches = await apiCall('/allMatches');
+                const matchDatalist = document.getElementById('match-datalist');
+                matchDatalist.innerHTML = ''; // Clear old options
+                matches.forEach(m => {
+                    matchDatalist.innerHTML += `<option value="${m.match_id}">`;
+                });
+
+                cachedTeams = await apiCall('/teams');
+                const teamDatalist = document.getElementById('team-datalist');
+                teamDatalist.innerHTML = '';
+                cachedTeams.forEach(t => {
+                    teamDatalist.innerHTML += `<option value="${t.team_id}">`;
+                });
+            } catch (err) { }
+        }
+
+        function autofetchTeamName() {
+            // Get the value typed/selected in the searchable input
+            const inputVal = document.getElementById('stat-team-id').value;
+            const nameInput = document.getElementById('stat-team-name');
+
+            // Find the team in our cached list
+            const team = cachedTeams.find(t => t.team_id === inputVal);
+
+            // Update the disabled name field
+            nameInput.value = team ? team.team_name : '';
+        }
+
+        async function handleCreateMatch(e) {
+            e.preventDefault();
+            const suffix = document.getElementById('match-suffix').value;
+            const body = { match_date: new Date().toISOString(), suffix: suffix };
+            try {
+                const res = await apiCall('/createTeamMatch', 'POST', body);
+                showMsg(`Match created: ${res.id}`);
+                loadAdminDashboard(); // Refresh dropdowns
+                document.getElementById('match-suffix').value = '';
+            } catch (err) { }
+        }
+
+        async function handleCreateStats(e) {
+            e.preventDefault();
+            const body = {
+                match_id: document.getElementById('stat-match-id').value,
+                map_name: document.getElementById('stat-map-name').value,
+                team_id: document.getElementById('stat-team-id').value,
+                kills: parseInt(document.getElementById('stat-kills').value),
+                result: document.getElementById('stat-result').value
+            };
+            if (!body.match_id || !body.team_id) {
+                showMsg("Match ID and Team ID are required.", true);
+                return;
+            }
+
+            try {
+                // This hits your /createMatchPerformance endpoint
+                const response = await apiCall('/createMatchPerformance', 'POST', body);
+
+                showMsg('Performance submitted! Score/Rating calculated by system.');
+
+                // Reset fields for the next entry
+                document.getElementById('stat-kills').value = '';
+                document.getElementById('stat-team-id').value = '';
+                document.getElementById('stat-team-name').value = '';
+
+
+            } catch (err) {
+
+                console.error("Submission Error:", err);
+            }
+        }
+
+        // --- COMMUNITY SECTION ---
+        async function loadCommunity() {
+            const adminGate = document.getElementById('community-admin-gate');
+            const statusMsg = document.getElementById('comm-status-msg');
+            const adminBtn = document.getElementById('comm-admin-btn');
+            const postSection = document.getElementById('admin-post-section');
+            const feed = document.getElementById('community-feed');
+
+            // 1. Role-based Visibility Logic
+            if (role === 'admin') {
+                postSection.style.display = 'block';
+                adminGate.style.display = 'none';
+                loadAdminDashboard(); // Ensure datalists are populated for the summary form
+            } else {
+                postSection.style.display = 'none';
+                adminGate.style.display = 'block';
+                statusMsg.textContent = role === 'team' ? "Logged in as Team" : "Viewing as Guest";
+                adminBtn.style.display = role === 'admin' ? 'none' : 'inline-block';
+            }
+
+            // 2. Load Content
+            try {
+                const posts = await apiCall('/community/posts');
+                feed.innerHTML = '';
+
+                if (posts.length === 0) {
+                    // Team/Guest can still see the page and an "Empty" state
+                    feed.innerHTML = `
+                <div class="post-card">
+                    <h2 class="text-yellow">General Discussion</h2>
+                    <p>No match summaries have been published yet.</p>
+                    <div id="general-comments-area">
+                        <p style="margin-top:1rem; color:var(--text-muted); font-style: italic;">
+                           Wait for an Admin to publish the first match performance summary to start commenting.
+                        </p>
+                    </div>
+                </div>`;
+                    return;
+                }
+
+                // 3. Render Published Posts (if any)
+                for (let post of posts) {
+                    const comments = await apiCall(`/community/${post.id}/comments`);
+
+                    let tableHTML = `<table><thead><tr><th>Rank</th><th>Team</th><th>Kills</th><th>Score</th></tr></thead><tbody>`;
+                    post.table_data.forEach(row => {
+                        tableHTML += `<tr><td class="text-yellow">#${row.rank}</td><td class="uppercase">${row.team_name}</td><td>${row.total_kills}</td><td>${row.total_score}</td></tr>`;
+                    });
+                    tableHTML += '</tbody></table>';
+
+                    let commentsHTML = `<div style="margin-top:1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;"><h4>Discussion</h4>`;
+                    comments.forEach(c => {
+                        const author = c.team_id ? `Team ${c.team_id}` : `Admin`;
+                        commentsHTML += `<p style="margin: 0.5rem 0; font-size: 0.9rem;"><strong class="text-yellow">${author}:</strong> ${c.content}</p>`;
+                    });
+
+                    commentsHTML += `
+                <form style="display:flex; gap:0.5rem; margin-top:1rem;" onsubmit="handleComment(event, ${post.id})">
+                    <input type="text" id="comment-input-${post.id}" placeholder="Write a comment..." required 
+                           style="flex:1; padding:0.5rem; background:var(--bg-color); color:white; border:1px solid var(--border-color); border-radius:4px;">
+                    <button type="submit" class="btn">Send</button>
+                </form>
+            </div>`;
+
+                    feed.innerHTML += `
+                <div class="post-card">
+                    <h2 style="margin-bottom:0.5rem;">Match Summary: <span class="text-yellow">${post.match_id}</span></h2>
+                    ${tableHTML}
+                    ${commentsHTML}
+                </div>`;
+                }
+            } catch (err) {
+                console.error("Community Load Error:", err);
+            }
+        }
+
+        async function handleCreatePost(e) {
+            e.preventDefault();
+
+            // 1. Grab the value from the searchable input
+            const matchIdInput = document.getElementById('post-match-id');
+            const matchId = matchIdInput.value.trim();
+
+            // 2. Client-side validation
+            if (!matchId) {
+                showMsg("Please enter or select a valid Match ID.", true);
+                return;
+            }
+
+            try {
+                // 3. Call the backend
+                // Note: Using a query parameter as per your previous endpoint definition
+                await apiCall(`/community/createPost?match_id=${encodeURIComponent(matchId)}`, 'POST');
+
+                showMsg(`Match summary for ${matchId} published successfully!`);
+
+                // 4. Reset the input and refresh the feed
+                matchIdInput.value = '';
+                loadCommunity();
+            } catch (err) {
+                // Errors (like 404 Match Not Found) are handled by the global apiCall catch
+                console.error("Post Creation Error:", err);
+            }
+        }
+        async function handleComment(e, postId) {
+            e.preventDefault();
+            const content = document.getElementById(`comment-input-${postId}`).value;
+            const endpoint = role === 'admin'
+                ? `/community/${postId}/admin_comment`
+                : `/community/${postId}/team_comment`;
+
+            try {
+                await apiCall(endpoint, 'POST', { content });
+                loadCommunity(); // Reload to show new comment
+            } catch (err) { }
+        }
+
+        // Init UI on load
+        updateNavUI();
+        if (token) {
+            // Auto-route based on stored token and role
+            if (role === 'admin') switchView('admin-dashboard');
+            else if (role === 'team') switchView('team-dashboard');
+        }
+
+    </script>
+</body>
+
+</html>

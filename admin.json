@@ -1,0 +1,18 @@
+[
+  {
+    "id":1,
+    "name": "Super Admin",
+    "email": "espire_admin@example.com",
+    "username": "espire_root",
+    "password": "StrongPassword123"
+  },
+  {
+    "id":2,
+    "name":"Raushan Kumar",
+    "email":"raushankumar099@outlook.com",
+    "username":"raushan99_x",
+    "password":"Rau@80espire"
+  }
+  
+]
+
