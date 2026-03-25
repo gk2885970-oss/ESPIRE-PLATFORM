@@ -13,6 +13,9 @@ Settings = Important_Settings()
 
 espire = FastAPI(title="Espire Platform")
 
+@espire.get("/")
+def home():
+    return {"message": "Espire Plateform API running"}
 from fastapi.middleware.cors import CORSMiddleware
 
 espire.add_middleware(
