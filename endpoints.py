@@ -103,34 +103,22 @@ def verify_password(plain_password, hashed_password):
 
 
 '''------------------------ROUTE- REGISTER TEAM------------------------------------'''
-# ------------------ REGISTER TEAM ------------------
+@espire.post("/registerTeam",response_model=Registration_Response)
+def Team_Registration(body:Register_Team, db:Session=Depends(get_db)):
 
-@espire.post("/registerTeam", response_model=Registration_Response)
-def team_registration(body: Register_Team, db: Session = Depends(get_db)):
-
-    # Check email
-    is_team_exist = db.query(Team).filter(Team.email == body.email).first()
-    if is_team_exist:
-        raise HTTPException(status_code=409, detail="Email already exists")
-
-    # Check team name
-    is_team_exist = db.query(Team).filter(Team.team_name == body.team_name).first()
-    if is_team_exist:
-        raise HTTPException(status_code=409, detail="Team already exists")
-
-    # Password hash
+    is_teamExist= db.query(Team).filter(Team.email== body.email).first()
+    if is_teamExist:
+        raise HTTPException(status_code=409, detail={"message":"Email already exist"})
+    is_teamExist=db.query(Team).filter(Team.team_name==body.team_name).first()
+    if is_teamExist:
+        raise HTTPException(status_code=409,detail={"msg":"Team already exist."})
+    
     hashed_password = get_password_hash(body.password)
-
-    # Generate team ID
-    year = datetime.now().strftime("%y")
+    year=datetime.now().strftime("%y")
     prefix = "ESP"
-
-    last_team = db.query(Team)\
-        .filter(Team.id.like(f"{year}{prefix}%"))\
-        .order_by(Team.id.desc())\
-        .first()
-
+    last_team = db.query(Team).filter(Team.id.startswith(year+prefix)).order_by(Team.id.desc()).first()
     if last_team:
+        # Extract last two digits (suffix)
         last_suffix = int(last_team.id[-2:])
         new_suffix = str(last_suffix + 1).zfill(2)
     else:
@@ -138,123 +126,86 @@ def team_registration(body: Register_Team, db: Session = Depends(get_db)):
 
     team_id = f"{year}{prefix}{new_suffix}"
 
-    # Create team
     registered_team = Team(
         id=team_id,
-        team_name=body.team_name,
-        email=body.email,
-        hash_password=hashed_password
+        team_name = body.team_name,
+        email= body.email,
+        hash_password = hashed_password,
+        
     )
 
     db.add(registered_team)
     db.commit()
     db.refresh(registered_team)
 
-    return {
-        "team_id": registered_team.id,
-        "team_name": registered_team.team_name,
-        "email": registered_team.email
-    }
+    return ({
+        "team_id":registered_team.id,
+        "team_name":registered_team.team_name,
+        "email":registered_team.email
+    })
 
+'''--------------------------ROUTE- TEAM LOGIN--------------------------------------------'''
 
-# ------------------ JWT FUNCTIONS ------------------
+def create_access_token(data:dict):
+    expire_time= datetime.now()+timedelta(minutes=Settings.Expire_Time)
+    encode_data = {**data,"exp":expire_time}
+    return jwt.encode(encode_data,Settings.SECRET_KEY,algorithm=Settings.ALGORITHM)
 
-def create_access_token(data: dict):
-    expire_time = datetime.now() + timedelta(minutes=Settings.Expire_Time)
-    encode_data = {**data, "exp": expire_time}
-    return jwt.encode(encode_data, Settings.SECRET_KEY, algorithm=Settings.ALGORITHM)
-
-
-def decode_access_token(token: str):
+def decode_access_token(token:str):
     try:
-        payload = jwt.decode(token, Settings.SECRET_KEY, algorithms=[Settings.ALGORITHM])
+        payload=jwt.decode(token,Settings.SECRET_KEY,algorithms=Settings.ALGORITHM)
         return payload
     except JWTError:
         return None
 
-
-# ------------------ LOGIN ------------------
-
 @espire.post("/loginTeam")
-def team_login(body: Login_Model, db: Session = Depends(get_db)):
-
-    is_team = db.query(Team).filter(Team.email == body.email).first()
+def Team_Login(body:Login_Model,db:Session=Depends(get_db)):
+    is_team= db.query(Team).filter(Team.email==body.email).first()
     if not is_team:
-        raise HTTPException(status_code=401, detail="Invalid email")
-
+        raise HTTPException(status_code=401,detail="Invalid email.")
     if not verify_password(body.password, is_team.hash_password):
-        raise HTTPException(status_code=401, detail="Incorrect password")
+        raise HTTPException(status_code=401,detail="Incorrect password.")
+    
+    token = create_access_token({"email":is_team.email, "team_name":is_team.team_name,"team_id":is_team.id})
+    
+    return {"token":token, "token type":"bearer",
+            "msg":"Login Successful."}
 
-    token = create_access_token({
-        "email": is_team.email,
-        "team_name": is_team.team_name,
-        "team_id": is_team.id
-    })
+team_Oauth2_scheme = OAuth2PasswordBearer(tokenUrl="loginTeam")
 
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-        "message": "Login Successful"
-    }
-
-
-# ------------------ AUTH ------------------
-
-team_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="loginTeam")
-
-
-def get_current_team(
-    db: Session = Depends(get_db),
-    token: str = Depends(team_oauth2_scheme)
-):
+def get_current_team(db:Session=Depends(get_db),token:str = Depends(team_Oauth2_scheme)):
+    
+    
     payload = decode_access_token(token)
-
     if payload is None:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-
+        raise HTTPException(status_code=401, detail="Unauthorized Access")
     team_id = payload.get("team_id")
-    if not team_id:
+    if team_id is None:
         raise HTTPException(status_code=401, detail="Invalid token")
-
     team = db.query(Team).filter(Team.id == team_id).first()
-    if not team:
-        raise HTTPException(status_code=404, detail="Team not found")
-
+    if team is None:
+        raise HTTPException(status_code=404, detail="Team not found.")
     return team
 
-
-# ------------------ PROFILE ------------------
-
 @espire.get("/teamProfile")
-def team_profile(current_team: Team = Depends(get_current_team)):
-    return {
-        "team_name": current_team.team_name,
-        "id": current_team.id,
-        "email": current_team.email
-    }
-
-
-# ------------------ TEAM LIST ------------------
+def Team_Profile(current_team:Team=Depends(get_current_team)):
+    return {"team_name":current_team.team_name,
+            "id":current_team.id,
+            "email":current_team.email
+            }
 
 @espire.get("/teams")
 def list_teams(db: Session = Depends(get_db)):
     teams = db.query(Team).all()
-    return [{"team_id": t.id, "team_name": t.team_name} for t in teams]
-
+    return [{"team_id": t.id, "team_name":t.team_name} for t in teams]
 
 @espire.get("/teams/{team_id}")
-def get_team(team_id: str, db: Session = Depends(get_db)):
-    team = db.query(Team).filter(Team.id == team_id).first()
-
+def get_team(team_id:str,db:Session=Depends(get_db)):
+    team = db.query(Team).filter(Team.id==team_id).first()
     if not team:
-        raise HTTPException(status_code=404, detail="Team not found")
-
-    return {
-        "team_id": team.id,
-        "team_name": team.team_name
-    }
-
-
+        raise HTTPException(status_code=404,detail="Team not found.")
+    return {"team_id":team.id,"team_name":team.team_name}
+   
 
 
 
