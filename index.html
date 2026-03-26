@@ -286,7 +286,7 @@
         }
 
         async function loadTeams() {
-            const response = await fetch("http://localhost:8000/teams"); // backend endpoint
+            const response = await fetch("https://espire-platform--gk2885970.replit.app"); // backend endpoint
             const teams = await response.json();
             const datalist = document.getElementById("teams");
 
@@ -302,7 +302,7 @@
             const teamId = this.value;
             if (teamId) {
                 try {
-                    const response = await fetch(`http://localhost:8000/teams/${teamId}`);
+                    const response = await fetch(`https://espire-platform--gk2885970.replit.app/teams/${teamId}`);
                     if (!response.ok) throw new Error("Team not found");
                     const data = await response.json();
                     document.getElementById("team_name").value = data.team_name;
