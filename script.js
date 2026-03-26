@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8000";
+const API_BASE = "http://espire-platform.gk2885970.replit.dev";
 
 // TEAM LOGIN
 async function loginTeam() {
