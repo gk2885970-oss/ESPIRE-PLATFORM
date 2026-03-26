@@ -1,4 +1,4 @@
-const API_BASE = "http://espire-platform.gk2885970.replit.dev";
+const API_BASE = "http://espire-platform.gk2885970.replit.app";
 
 // TEAM LOGIN
 async function loginTeam() {
