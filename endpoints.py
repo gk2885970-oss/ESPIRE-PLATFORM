@@ -422,4 +422,4 @@ async def auto_delete_expired_posts():
 async def lifespan(app:FastAPI):
     asyncio.create_task(auto_delete_expired_posts())
     yield
-app = FastAPI(lifespan=lifespan)
+espire.router.lifespan_context = lifespan
