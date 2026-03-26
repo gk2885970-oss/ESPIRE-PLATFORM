@@ -57,8 +57,7 @@ class MatchPerformance(Base):
     result: Mapped[str] = mapped_column(String(50), nullable=False)
     rating: Mapped[float] = mapped_column(Float, nullable=True)
     match: Mapped["Match"] = relationship("Match", back_populates="performances")
-    team: Mapped["Team"] = relationship("Team", back_populates="team")
-
+    team: Mapped["Team"] = relationship("Team", back_populates="performances")
     @property
     def team_name(self) -> str:
         return self.team.team_name if self.team else "Unknown"
