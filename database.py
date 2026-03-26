@@ -1,5 +1,7 @@
 from connect import engine
-
 from sqlalchemy.orm import sessionmaker
+from sql_models import Base
 
-SessionLocal = sessionmaker(autoflush=False, autocommit=False,bind=engine)
+Base.metadata.create_all(bind=engine)
+
+SessionLocal = sessionmaker(autoflush=False, autocommit=False, bind=engine)
